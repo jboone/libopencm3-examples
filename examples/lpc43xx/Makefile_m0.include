@@ -29,7 +29,7 @@ OBJDUMP		= $(PREFIX)-objdump
 GDB		= $(PREFIX)-gdb
 
 TOOLCHAIN_DIR ?= ../../../../libopencm3
-ifeq ($(wildcard ../../../../libopencm3/lib/libopencm3_lpc43xx.a),)
+ifeq ($(wildcard ../../../../libopencm3/lib/libopencm3_lpc43xx_m0.a),)
 ifneq ($(strip $(shell which $(CC))),)
 TOOLCHAIN_DIR := $(shell dirname `which $(CC)`)/../$(PREFIX)
 endif
@@ -44,10 +44,10 @@ CFLAGS		+= -O2 -g \
 		   -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes \
 		   -Wundef -Wshadow \
 		   -I$(TOOLCHAIN_DIR)/include -fno-common \
-		   -mcpu=cortex-m4 -mthumb -MD \
-		   -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DLPC43XX
+		   -mcpu=cortex-m0 -mthumb -MD \
+		   -DLPC43XX
 LDSCRIPT	?= $(BINARY).ld
-LDFLAGS         += -L$(TOOLCHAIN_DIR)/lib -L$(TOOLCHAIN_DIR)/lib/lpc43xx \
+LDFLAGS         += -L$(TOOLCHAIN_DIR)/lib -L$(TOOLCHAIN_DIR)/lib/lpc43xx_m0 \
 		   -T$(LDSCRIPT) -nostartfiles -Wl,--gc-sections -Xlinker -Map=$(BINARY).map
 OBJS		+= $(BINARY).o
 
@@ -91,9 +91,9 @@ flash: $(BINARY).flash
 	@#printf "  OBJDUMP $(*).list\n"
 	$(Q)$(OBJDUMP) -S $(*).elf > $(*).list
 
-%.elf: $(OBJS) $(LDSCRIPT) $(TOOLCHAIN_DIR)/lib/libopencm3_lpc43xx.a
+%.elf: $(OBJS) $(LDSCRIPT) $(TOOLCHAIN_DIR)/lib/libopencm3_lpc43xx_m0.a
 	@#printf "  LD      $(subst $(shell pwd)/,,$(@))\n"
-	$(Q)$(LD) $(LDFLAGS) -o $(*).elf $(OBJS) -lopencm3_lpc43xx
+	$(Q)$(LD) $(LDFLAGS) -o $(*).elf $(OBJS) -lopencm3_lpc43xx_m0
 
 %.o: %.c Makefile
 	@#printf "  CC      $(subst $(shell pwd)/,,$(@))\n"
